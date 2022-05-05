@@ -76,13 +76,20 @@ class Color:
     def get_HSL(self) -> Tuple[float, float, float]:
         return self.RGBtoHSL(self.red, self.green, self.blue)
 
-    def set_new_saturation(self, new_S: float) -> None:
+    def set_new_hue(self, new_H: float) -> None:
+        assert 0 <= new_H <= 360
         H, S, L = self.get_HSL()
-        red, green, blue = self.HSLtoRGB(H, new_S, L)
+        self.red, self.green, self.blue = self.HSLtoRGB(new_H, S, L)
 
-        self.red = red
-        self.green = green
-        self.blue = blue
+    def set_new_saturation(self, new_S: float) -> None:
+        assert 0 <= new_S <= 1
+        H, S, L = self.get_HSL()
+        self.red, self.green, self.blue = self.HSLtoRGB(H, new_S, L)
+
+    def set_new_lightness(self, new_L: float) -> None:
+        assert 0 <= new_L <= 1
+        H, S, L = self.get_HSL()
+        self.red, self.green, self.blue = self.HSLtoRGB(H, S, new_L)
 
     @staticmethod
     def RGBtoHSL(red: int, green: int, blue: int) -> Tuple[float, float, float]:
