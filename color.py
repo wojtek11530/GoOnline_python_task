@@ -1,4 +1,3 @@
-import math
 import re
 from typing import Tuple
 
@@ -22,7 +21,7 @@ class Color:
         return 'Color:\n' + \
                f'\tRGBA: ({self.red},{self.green},{self.blue},{self.alpha})\n' + \
                f'\tHEX: {self.to_hex_format()}\n' + \
-               f'\tHue: {H}\n' + \
+               f'\tHue: {H:.2f}\n' + \
                f'\tSaturation: {S:.4f}\n' + \
                f'\tLightness: {L:.4f}'
 
