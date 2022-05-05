@@ -74,9 +74,21 @@ class Color:
         return hex_string
 
     def get_HSL(self) -> Tuple[float, float, float]:
-        red_prime = self.red / MAX_BOUND
-        green_prime = self.green / MAX_BOUND
-        blue_prime = self.blue / MAX_BOUND
+        return self.RGBtoHSL(self.red, self.green, self.blue)
+
+    def set_new_saturation(self, new_S: float) -> None:
+        H, S, L = self.get_HSL()
+        red, green, blue = self.HSLtoRGB(H, new_S, L)
+
+        self.red = red
+        self.green = green
+        self.blue = blue
+
+    @staticmethod
+    def RGBtoHSL(red: int, green: int, blue: int) -> Tuple[float, float, float]:
+        red_prime = red / MAX_BOUND
+        green_prime = green / MAX_BOUND
+        blue_prime = blue / MAX_BOUND
 
         max_rgb = max(red_prime, green_prime, blue_prime)
         min_rgb = min(red_prime, green_prime, blue_prime)
@@ -103,9 +115,9 @@ class Color:
         hue = hue * 60
         return hue, saturation, lightness
 
-    def set_new_saturation(self, new_S: float) -> None:
-        H, S, L = self.get_HSL()
-        C = (1 - abs(2 * L - 1)) * new_S
+    @staticmethod
+    def HSLtoRGB(H: float, S: float, L: float) -> Tuple[int, int, int]:
+        C = (1 - abs(2 * L - 1)) * S
         X = C * (1 - abs((H / 60) % 2 - 1))
 
         if 0 <= H < 60:
@@ -135,9 +147,11 @@ class Color:
 
         m = L - C / 2
 
-        self.red = int(MAX_BOUND * (new_r_prime + m))
-        self.green = int(MAX_BOUND * (new_g_prime + m))
-        self.blue = int(MAX_BOUND * (new_b_prime + m))
+        red = int(MAX_BOUND * (new_r_prime + m))
+        green = int(MAX_BOUND * (new_g_prime + m))
+        blue = int(MAX_BOUND * (new_b_prime + m))
+
+        return red, green, blue
 
     @staticmethod
     def _get_hexadecimal_format(number: int) -> str:
