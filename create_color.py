@@ -1,4 +1,4 @@
-# #!/usr/bin/python
+#!/usr/bin/python
 import argparse
 import re
 from typing import List
@@ -17,15 +17,15 @@ def create_color():
     )
     parser.add_argument('-m', '--mode', type=str, default='mix', metavar='MODE',
                         help="Mode for creating a new color, default: mix")
-    parser.add_argument('colors_strings', metavar='COLOR_CODES', type=str, nargs='*')
+    parser.add_argument('color_codes', metavar='COLOR_CODES', type=str, nargs='*')
 
     args = parser.parse_args()
-    color_strings = args.colors_strings
+    color_codes = args.color_codes
 
-    color_strings_from_file = get_colors_code_from_file()
+    color_codes_from_file = get_colors_code_from_file()
 
-    color_strings += color_strings_from_file
-    colors = get_colors_from_codes(color_strings)
+    color_codes += color_codes_from_file
+    colors = get_colors_from_codes(color_codes)
 
     if len(colors) > 0:
         mode = args.mode
@@ -40,7 +40,11 @@ def create_color():
         elif mode == 'highest':
             new_color = create_highest_color(colors)
         elif mode == 'mix-saturate':
-            colors[-1] = create_mix_saturate_color(colors)
+            if len(colors) <= 1:
+                print('Only one color in list. Cannot change the last color to have saturation '
+                      'equal to average of the rest one')
+            else:
+                mix_saturate_color(colors)
 
         print('All colors:')
         for c in colors:
@@ -53,9 +57,9 @@ def create_color():
         print('No color found. New color cannot be created.')
 
 
-def get_colors_from_codes(color_strings: List[str]) -> List[Color]:
+def get_colors_from_codes(color_codes: List[str]) -> List[Color]:
     colors = []
-    for cs in color_strings:
+    for cs in color_codes:
         if re.search("^([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$", cs):
             color = Color.from_hex_string(cs)
             colors.append(color)
@@ -106,18 +110,16 @@ def create_highest_color(colors: List[Color]) -> Color:
     return Color(red=new_red, green=new_green, blue=new_blue, alpha=new_alpha)
 
 
-def create_mix_saturate_color(colors: List[Color]) -> Color:
-    pass
+def mix_saturate_color(colors: List[Color]) -> None:
+    colors_num = len(colors[:-1])
 
+    average_saturation = 0
+    for c in colors[:-1]:
+        H, S, L = c.get_HSL()
+        average_saturation += S
 
-# parser.print_help()
-# for hex_string in ['#ff00ff00', 'ff00ff11', 'f01', 'ff0011']:
-#     c = Color.from_hex_string(hex_string)
-#     print(c)
-#
-# for rgb_string in ['255,0,0,255', '3,0,0,1']:
-#     c = Color.from_rgb_string(rgb_string)
-#     print(c)
+    average_saturation = average_saturation / colors_num
+    colors[-1].set_new_saturation(average_saturation)
 
 
 if __name__ == '__main__':

@@ -103,6 +103,42 @@ class Color:
         hue = hue * 60
         return hue, saturation, lightness
 
+    def set_new_saturation(self, new_S: float) -> None:
+        H, S, L = self.get_HSL()
+        C = (1 - abs(2 * L - 1)) * new_S
+        X = C * (1 - abs((H / 60) % 2 - 1))
+
+        if 0 <= H < 60:
+            new_r_prime = C
+            new_g_prime = X
+            new_b_prime = 0
+        elif 60 <= H < 120:
+            new_r_prime = X
+            new_g_prime = C
+            new_b_prime = 0
+        elif 120 <= H < 180:
+            new_r_prime = 0
+            new_g_prime = C
+            new_b_prime = X
+        elif 180 <= H < 240:
+            new_r_prime = 0
+            new_g_prime = X
+            new_b_prime = C
+        elif 240 <= H < 300:
+            new_r_prime = X
+            new_g_prime = 0
+            new_b_prime = C
+        else:
+            new_r_prime = C
+            new_g_prime = 0
+            new_b_prime = X
+
+        m = L - C / 2
+
+        self.red = int(MAX_BOUND * (new_r_prime + m))
+        self.green = int(MAX_BOUND * (new_g_prime + m))
+        self.blue = int(MAX_BOUND * (new_b_prime + m))
+
     @staticmethod
     def _get_hexadecimal_format(number: int) -> str:
         hex_format = hex(number).replace("0x", "")
